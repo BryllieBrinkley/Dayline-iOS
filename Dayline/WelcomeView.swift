@@ -5,8 +5,7 @@ struct WelcomeView: View {
 
     var body: some View {
         ScrollView {
-
-            VStack(spacing: 20) {
+            VStack {
 
                 WelcomeHeaderView()
                 

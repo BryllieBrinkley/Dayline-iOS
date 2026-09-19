@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WelcomeHeaderView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Dayline")
                 .font(.system(size: 48,
                               weight: .bold,
@@ -22,15 +22,10 @@ struct WelcomeHeaderView: View {
                                design: .serif
                            ))
 
-            Text("Your schedule, inbox, tasks, and news into one personalized morning edition — ready when you wake up.")
+            Text("Your calendar, emails, tasks, and news in one morning newspaper.")
                           .font(.system(size: 24, weight: .regular))
                           .foregroundStyle(.secondary)
-                          .lineSpacing(3)
-                          .fixedSize(
-                              horizontal: false,
-                              vertical: true
-                          )
-        
+            
         
             
         }
