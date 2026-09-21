@@ -44,7 +44,7 @@ struct RootTabView: View {
                 value: .customize
             ) {
                 NavigationStack {
-                    Text("Customize")
+                    CustomizeView()
                 }
             }
 
@@ -56,7 +56,7 @@ struct RootTabView: View {
                 value: .you
             ) {
                 NavigationStack {
-                    Text("You")
+                    UserSourceConnectionView()
                 }
             }
         }
@@ -70,10 +70,6 @@ struct RootTabView: View {
             for: .tabBar
         )
     }
-}
-
-#Preview {
-    RootTabView()
 }
 
 #Preview {

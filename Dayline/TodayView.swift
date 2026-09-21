@@ -42,8 +42,10 @@ struct TodayView: View {
                     message: "Be prepared. You've got this.",
                     systemImage: "calendar"
                 )
-                ScheduleSectionView()
                 TopThreeSectionView()
+                Spacer()
+                ScheduleSectionView()
+                
                 
                 Spacer()
             }
