@@ -2,13 +2,18 @@ import SwiftUI
 
 struct EditionCardView: View {
     
-    var edition: Edition
-    @State private var isSaved: Bool = false
+    let edition: Edition
+    let onTap: () -> Void
+
+    @State private var isSaved = false
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
+            
+            
+
+            
             Button {
-                print("Open \(edition.headline)")
             } label: {
                 HStack(alignment: .top, spacing: 14) {
                     Image(edition.imageName)
@@ -89,6 +94,5 @@ struct EditionCardView: View {
     }
 }
 #Preview {
-    EditionCardView(edition: Edition.sampleEditions.first!)
-}
+    EditionCardView(edition: Edition.sampleEditions.first!) {}}
 

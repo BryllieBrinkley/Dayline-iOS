@@ -1,9 +1,9 @@
 import SwiftUI
 
-struct UserSourceConnectionView: View {
+struct SourcesView: View {
 
-    @State private var viewModel = SourcesViewModel()
-
+    @State private var viewModel: SourcesViewModel = SourcesViewModel()
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             headerView
@@ -53,5 +53,5 @@ struct UserSourceConnectionView: View {
 }
 
 #Preview {
-    UserSourceConnectionView()
+    SourcesView()
 }

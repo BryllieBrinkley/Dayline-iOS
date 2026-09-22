@@ -1,14 +1,35 @@
+
 import Foundation
-import SwiftUI
 import Combine
 
-
-struct Edition: Identifiable {
-    let id = UUID()
+struct Edition: Identifiable, Codable, Hashable {
+    
+    let id: UUID
     let date: Date
     let readTime: Int
     let headline: String
     let imageName: String
+
+    let editionNumber: Int
+    let articles: [EditionArticle]
+
+    init(
+        id: UUID = UUID(),
+        date: Date,
+        readTime: Int,
+        headline: String,
+        imageName: String,
+        editionNumber: Int = 1,
+        articles: [EditionArticle] = []
+    ) {
+        self.id = id
+        self.date = date
+        self.readTime = readTime
+        self.headline = headline
+        self.imageName = imageName
+        self.editionNumber = editionNumber
+        self.articles = articles
+    }
 }
 extension Edition {
     
@@ -87,3 +108,4 @@ extension Edition {
         )
     ]
 }
+

@@ -2,7 +2,11 @@ import SwiftUI
 
 struct ConnectionSourceRowView: View {
 
-    let source: SourceItem
+    let source: OnboardingSourceItem
+
+    private var isConnected: Bool {
+        source.isSelected
+    }
 
     private let usesLogo: Set<String> = [
         "Google Calendar",
@@ -17,12 +21,12 @@ struct ConnectionSourceRowView: View {
 
     var body: some View {
         Button {
-            print("Connect or disconnect \(source.name)")
+            print("Connect or disconnect \(source.isSelected)")
         } label: {
             HStack(spacing: 12) {
                 sourceIcon
 
-                Text(source.name)
+                Text(source.type.title)
                     .font(.system(size: 16, weight: .medium))
                     .lineLimit(1)
 
@@ -43,17 +47,18 @@ struct ConnectionSourceRowView: View {
         }
         .buttonStyle(.plain)
     }
-
     @ViewBuilder
     private var sourceIcon: some View {
-        if usesLogo.contains(source.name) {
-            Image(source.icon)
+        switch source.type.icon {
+        case .asset(let imageName):
+            Image(imageName)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 28, height: 28)
                 .frame(width: 32, height: 32)
-        } else {
-            Image(systemName: source.icon)
+
+        case .system(let symbolName):
+            Image(systemName: symbolName)
                 .resizable()
                 .scaledToFit()
                 .foregroundStyle(.primary)
@@ -64,26 +69,16 @@ struct ConnectionSourceRowView: View {
 
     private var statusText: some View {
         Text(
-            source.connectionStatus == .connected
-                ? "Connected"
-                : "Not Connected"
+            isConnected ? "Connected" : "Not Connected"
         )
         .font(.system(size: 15, weight: .medium))
         .foregroundStyle(
-            source.connectionStatus == .connected
-                ? Color.green
-                : Color.red
+            isConnected ? Color.green : Color.red
         )
         .frame(width: 110, alignment: .trailing)
     }
 }
 
 #Preview {
-    ConnectionSourceRowView(
-        source: SourceItem(
-            name: "Outlook Mail",
-            icon: "outlook-mail-logo",
-            connectionStatus: .connected
-        )
-    )
+    ConnectionSourceRowView(source: OnboardingSourceItem(type: .notion, isSelected: true))
 }

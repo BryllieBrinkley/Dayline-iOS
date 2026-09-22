@@ -35,18 +35,15 @@ struct TodayView: View {
                     .lineLimit(1)
 
                     Spacer()
-                    
-                    CurrentWeatherView()
+                    currentWeatherView
                 }
                 TodaysFocusCard(
                     title: "Interview at 2:00 PM",
                     message: "Be prepared. You've got this.",
                     systemImage: "calendar"
                 )
-                TopThreeSectionView()
-                Spacer()
                 ScheduleSectionView()
-                
+                TopThreeSectionView()
                 
                 Spacer()
             }
@@ -63,6 +60,44 @@ struct TodayView: View {
             os_log("TodayView appeared at %{public}@", String(describing: Date()))
         }
     }
+
+    @ViewBuilder
+    private var currentWeatherView: some View {
+        if let currentWeather =
+            weatherManager.currentWeather {
+
+            HStack(spacing: 6) {
+                Image(systemName: currentWeather.symbolName)
+                    .font(.system(size: 26))
+                    .symbolRenderingMode(.multicolor)
+
+                Text(
+                    currentWeather.temperature.formatted(
+                        .measurement(
+                            width: .abbreviated,
+                            usage: .weather,
+                            numberFormatStyle: .number
+                                .precision(.fractionLength(0))
+                        )
+                    )
+                )
+                .font(.title2)
+                .fontWeight(.semibold)
+            }
+
+        } else if weatherManager.isLoading {
+
+            ProgressView()
+
+        } else if let errorMessage =
+                    weatherManager.errorMessage {
+
+            Text(errorMessage)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
     @ViewBuilder
     private var headerWithProfilePicView: some View {
         HStack {

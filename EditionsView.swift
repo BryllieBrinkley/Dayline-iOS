@@ -4,26 +4,42 @@ struct PastEditionsView: View {
     
     @State private var selectedDate = Date.now
     @State private var isSaved = false
-    @State private var selectedEdition: Edition?
     
     private let editions = Edition.sampleEditions
     
+    private var weekDates: [Date] {
+        let calendar = Calendar.current
+        
+        guard let week = calendar.dateInterval(
+            of: .weekOfYear,
+            for: selectedDate
+        ) else {
+            return []
+        }
+        
+        return (0..<7).compactMap { day in
+            calendar.date(
+                byAdding: .day,
+                value: day,
+                to: week.start
+            )
+        }
+    }
+    
     var body: some View {
-        VStack() {
+        VStack(spacing: 0) {
             headerView
             
             monthView
             
             weekPicker
             
-            Divider()
-            
             ScrollView {
                 LazyVStack(spacing: 12) {
                     ForEach(editions) { edition in
-                        EditionCardView(edition: edition) {
-                            selectedEdition = edition
-                        }
+                        EditionCardView(
+                            edition: edition
+                        )
                     }
                 }
                 .padding(.horizontal)
@@ -32,15 +48,18 @@ struct PastEditionsView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .sheet(item: $selectedEdition) { edition in
-            EditionDetailView()
-        }
     }
     
     private var headerView: some View {
         HStack {
             Text("Past Editions")
-                .font(.system(size: 34, weight: .bold, design: .serif))
+                .font(
+                    .system(
+                        size: 38,
+                        weight: .bold,
+                        design: .serif
+                    )
+                )
             
             Spacer()
             
@@ -128,25 +147,6 @@ struct PastEditionsView: View {
         }
         .padding(.horizontal)
         .padding(.top, 10)
-        
-    }
-    private var weekDates: [Date] {
-        let calendar = Calendar.current
-        
-        guard let week = calendar.dateInterval(
-            of: .weekOfYear,
-            for: selectedDate
-        ) else {
-            return []
-        }
-        
-        return (0..<7).compactMap { day in
-            calendar.date(
-                byAdding: .day,
-                value: day,
-                to: week.start
-            )
-        }
     }
 }
 

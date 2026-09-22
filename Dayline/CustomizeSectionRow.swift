@@ -14,9 +14,11 @@ struct CustomizeSectionRow: View {
     var body: some View {
         HStack {
             Spacer()
-            Toggle("\(section.title)", systemImage: "\(section.iconName)", isOn: $section.isEnabled)
-                .toggleStyle(.switch)
-                .foregroundStyle(.black)
+            Toggle(isOn: $section.isEnabled) {
+                Label(section.title, systemImage: section.iconName)
+            }
+            .toggleStyle(.switch)
+            .foregroundStyle(.black)
             
         }
         

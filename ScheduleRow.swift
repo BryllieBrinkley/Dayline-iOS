@@ -8,11 +8,11 @@ struct ScheduleRowView: View {
     var isLast = false
 
     private var isCurrent: Bool {
-        item.isCurrent
+        item.isCurrent()
     }
 
     private var hasPassed: Bool {
-        item.hasPassed
+        item.hasPassed()
     }
 
     private var markerColor: Color {
@@ -97,9 +97,10 @@ struct ScheduleRowView: View {
 #Preview {
     ScheduleRowView(
         item: ScheduleItem(
-            title: "Interview",
             startDate: .now.addingTimeInterval(-1_800),
             endDate: .now.addingTimeInterval(1_800),
+            title: "Interview",
+            detail: "Horizon Media"
         ),
         isFirst: true,
         isLast: true
