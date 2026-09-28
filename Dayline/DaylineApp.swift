@@ -16,7 +16,7 @@ struct DaylineApp: App {
     var body: some Scene {
     
         WindowGroup {
-            RootTabView()
+            EditionDetailView()
         }
     }
 }
