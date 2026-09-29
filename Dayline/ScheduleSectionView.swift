@@ -12,6 +12,7 @@ import SwiftUI
 struct ScheduleSectionView: View {
 
     let scheduleItems = ScheduleItem.sampleItems
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         VStack(spacing: 0) {
@@ -24,7 +25,7 @@ struct ScheduleSectionView: View {
                 Spacer()
 
                 Button("See all") {
-                    print("Open full schedule")
+                    
                 }
                 .font(.subheadline)
             }
@@ -32,20 +33,6 @@ struct ScheduleSectionView: View {
 
             Divider()
 
-            ForEach(
-                Array(scheduleItems.enumerated()),
-                id: \.element.id
-            ) { entry in
-
-                let index = entry.offset
-                let item = entry.element
-
-                ScheduleRowView(
-                    item: item,
-                    isFirst: index == 0,
-                    isLast: index == scheduleItems.count - 1
-                )
-            }
         }
     }
 }

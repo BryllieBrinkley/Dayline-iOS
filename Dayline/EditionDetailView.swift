@@ -1,12 +1,6 @@
-//
-//  EditionDetailView.swift
-//  Dayline
-//
-//  Created by Jibryll Brinkley on 9/22/26.
-//
-
 import SwiftUI
 import EventKit
+import WeatherKit
 
 struct EditionDetailView: View {
     @Environment(\.dismiss) private var dismiss
@@ -15,6 +9,7 @@ struct EditionDetailView: View {
     @State private var news: NewsArticle?
     @State private var todayEvents: [EKEvent] = []
     private let calendarService = DayCalendarService()
+    private let weatherManager = WeatherManager()
     
     let currentDate = Date()
     let editionNumber = 24
@@ -56,23 +51,29 @@ struct EditionDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .task {
-        do {
-            news = try await viewModel.fetchNews()
-            print("Loaded news:", news?.title ?? "No title")
-        } catch {
-            print("News fetch failed:", error)
-        }
+            do {
+                news = try await viewModel.fetchNews()
+                print("Loaded news:", news?.title ?? "No title")
+            } catch {
+                print("News fetch failed:", error)
+            }
             do {
                 todayEvents = try await calendarService.fetchEvents()
                 print("Events found:", todayEvents.count)
                 for event in todayEvents {
                     print(event.title ?? "Untitled", event.startDate ?? "Untitled start date")
-                    }
+                }
             } catch {
                 print("Calendar fetch failed:", error)
             }
-
-    }
+            
+            do {
+                try await weatherManager.fetchCurrentWeather()
+            } catch {
+                print("Wether fetch failed:", error)
+            }
+            
+        }
         
     }
     
@@ -126,6 +127,8 @@ struct EditionDetailView: View {
     private var newspaperGrid: some View {
         Grid(horizontalSpacing: 14, verticalSpacing: 12) {
             GridRow(alignment: .top) {
+                weatherView
+                    .newspaperColumnDivider()
                 VStack(alignment: .leading, spacing: 8) {
                     Image("skyline")
                         .resizable()
@@ -143,38 +146,26 @@ struct EditionDetailView: View {
                         .fontWeight(.semibold)
                     
                 }
-                .newspaperColumnDivider()
-                yourWorldSection
-                
-                
-                
             }
             
             horizontalRule
             
             GridRow(alignment: .top) {
+                yourWorldSection
+                    .newspaperColumnDivider()
                 dailyEventsSection
                 
-                .newspaperColumnDivider()
-                
-                NewspaperArticleView(
-                    title: "Inbox Intellegence",
-                    subtitle: "2 deliveries on the way",
-                    bodyText: """
-                    • MacBook case — arrives tomorrow
-                    • Books — arrive Saturday
-                    """,
-                    page: 3
-                )
             }
             
             horizontalRule
             
             GridRow(alignment: .top) {
                 crosswordCard
+                    .newspaperColumnDivider()
+                TopThreeSectionView()
             }
         }
-
+        
         .onAppear(perform: {
             Task {
                 do {
@@ -196,17 +187,17 @@ struct EditionDetailView: View {
         guard !todayEvents.isEmpty else {
             return "No events scheduled today."
         }
-
+        
         let lines: [String] = todayEvents.map { event in
             let time = event.isAllDay
-                ? "All day"
-                : event.startDate.formatted(date: .omitted, time: .shortened)
+            ? "All day"
+            : event.startDate.formatted(date: .omitted, time: .shortened)
             
             print("\(time) — \(event.title ?? "Untitled event")")
             return "\(time) — \(event.title ?? "Untitled event")"
             
         }
-
+        
         return lines.joined(separator: "\n")
     }
     
@@ -284,7 +275,52 @@ struct EditionDetailView: View {
                 .font(.system(.body, design: .serif))
         }
     }
+    
+    private var weatherView: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            
+            if let currentWeather = weatherManager.currentWeather {
+                
+                Text(weatherManager.cityName ?? "Weather")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                
+                HStack(spacing: 5) {
+                    Image(systemName: currentWeather.symbolName)
+                        .symbolRenderingMode(.multicolor)
+                    
+                    Text(
+                        currentWeather.temperature.formatted(
+                            .measurement(
+                                width: .abbreviated,
+                                usage: .weather,
+                                numberFormatStyle: .number
+                                    .precision(.fractionLength(0))
+                            )
+                        )
+                    )
+                    .fontWeight(.semibold)
+                }
+                
+                Text(currentWeather.condition.description)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                
+            } else if weatherManager.isLoading {
+                
+                ProgressView()
+                
+            } else if let errorMessage = weatherManager.errorMessage {
+                
+                Text(errorMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .font(.largeTitle)
+    }
 }
+
 extension View {
     func newspaperColumnDivider() -> some View {
         overlay(alignment: .trailing) {

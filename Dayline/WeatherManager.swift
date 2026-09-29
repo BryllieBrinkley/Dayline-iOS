@@ -12,6 +12,7 @@ final class WeatherManager: NSObject,
     private let locationManager = CLLocationManager()
 
     var currentWeather: CurrentWeather?
+    var cityName: String?
     var isLoading = false
     var errorMessage: String?
 

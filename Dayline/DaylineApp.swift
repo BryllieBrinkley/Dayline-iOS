@@ -10,13 +10,13 @@ import SwiftUI
 @main
 struct DaylineApp: App {
 
-//    @AppStorage("hasCompletedOnboarding")    
-//    private var hasCompletedOnboarding = false
+    @AppStorage("hasCompletedOnboarding")    
+    private var hasCompletedOnboarding = false
 
     var body: some Scene {
     
         WindowGroup {
-            EditionDetailView()
+            RootTabView()
         }
     }
 }
