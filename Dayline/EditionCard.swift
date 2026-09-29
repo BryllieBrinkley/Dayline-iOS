@@ -9,18 +9,14 @@ struct EditionCardView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            
-            
-
-            
-            Button {
+            NavigationLink {
+                EditionDetailView()
             } label: {
                 HStack(alignment: .top, spacing: 14) {
                     Image(edition.imageName)
                         .resizable()
                         .scaledToFill()
                         .frame(width: 100, height: 100)
-
                         .clipShape(
                             RoundedRectangle(cornerRadius: 5)
                         )
@@ -31,8 +27,7 @@ struct EditionCardView: View {
 
                         Text("\(edition.readTime) min read")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
-
+                        
                         Text(edition.headline)
                                 .font(.system(size: 18, weight: .semibold, design: .serif))
                                 .fixedSize(horizontal: false, vertical: true)                            .layoutPriority(1)
@@ -43,6 +38,7 @@ struct EditionCardView: View {
                         alignment: .leading
                     )
                 }
+                .foregroundStyle(.primary)
                 .padding(14)
                 .padding(.trailing, 28)
                 .frame(
@@ -52,7 +48,6 @@ struct EditionCardView: View {
                 )
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
 
             Button {
                 isSaved.toggle()

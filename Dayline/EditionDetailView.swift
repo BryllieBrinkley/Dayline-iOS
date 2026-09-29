@@ -277,15 +277,13 @@ struct EditionDetailView: View {
     }
     
     private var weatherView: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .center, spacing: 10) {
             
             if let currentWeather = weatherManager.currentWeather {
                 
                 Text(weatherManager.cityName ?? "Weather")
-                    .font(.caption)
-                    .fontWeight(.semibold)
+           
                 
-                HStack(spacing: 5) {
                     Image(systemName: currentWeather.symbolName)
                         .symbolRenderingMode(.multicolor)
                     
@@ -300,10 +298,10 @@ struct EditionDetailView: View {
                         )
                     )
                     .fontWeight(.semibold)
-                }
+                
                 
                 Text(currentWeather.condition.description)
-                    .font(.caption2)
+        
                     .foregroundStyle(.secondary)
                 
             } else if weatherManager.isLoading {
@@ -317,8 +315,11 @@ struct EditionDetailView: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .padding()
         .font(.largeTitle)
-    }
+        .fontWeight(.semibold)
+        .fontDesign(.serif)
+        }
 }
 
 extension View {

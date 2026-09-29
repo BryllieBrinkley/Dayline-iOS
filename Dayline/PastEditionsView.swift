@@ -32,9 +32,6 @@ struct PastEditionsView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .sheet(item: $selectedEdition) { edition in
-            EditionDetailView()
-        }
     }
     
     private var headerView: some View {
