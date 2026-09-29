@@ -48,6 +48,7 @@ struct EditionCardView: View {
                 )
                 .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
 
             Button {
                 isSaved.toggle()

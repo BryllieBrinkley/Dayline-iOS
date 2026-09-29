@@ -38,11 +38,7 @@ struct TodayView: View {
                     
                     CurrentWeatherView()
                 }
-                TodaysFocusCard(
-                    title: "Interview at 2:00 PM",
-                    message: "Be prepared. You've got this.",
-                    systemImage: "calendar"
-                )
+
                 TopThreeSectionView()
                 Spacer()
                 ScheduleSectionView()
@@ -53,7 +49,6 @@ struct TodayView: View {
             .padding(.horizontal)
         }
         .task {
-            // Defer a touch to let first frame render
             try? await Task.sleep(nanoseconds: 150_000_000)
             await MainActor.run {
                 weatherManager.fetchCurrentWeather()
