@@ -1,11 +1,11 @@
 import SwiftUI
-
 struct SelectConnectionsView: View {
 
-    @State private var isEmailSelected = false
-    @State private var isCalendarSelected = false
-    @State private var isRemindersSelected = false
-    @State private var isInterestsSelected = false
+    @ObservedObject var viewModel: SelectConnectionsViewModel
+
+    init(viewModel: SelectConnectionsViewModel = SelectConnectionsViewModel()) {
+        self.viewModel = viewModel
+    }
 
     var body: some View {
 
@@ -20,27 +20,27 @@ struct SelectConnectionsView: View {
                 SelectConnectionRow(
                     connectionType: "Email",
                     systemImage: "envelope",
-                    isSelected: $isEmailSelected
+                    isSelected: $viewModel.isEmailSelected
                 )
 
 
                 SelectConnectionRow(
                     connectionType: "Calendar",
                     systemImage: "calendar",
-                    isSelected: $isCalendarSelected
+                    isSelected: $viewModel.isCalendarSelected
                 )
 
 
                 SelectConnectionRow(
                     connectionType: "Reminders",
                     systemImage: "checklist",
-                    isSelected: $isRemindersSelected
+                    isSelected: $viewModel.isRemindersSelected
                 )
 
                 SelectConnectionRow(
                     connectionType: "Interests",
                     systemImage: "sparkles",
-                    isSelected: $isInterestsSelected
+                    isSelected: $viewModel.isInterestsSelected
                 )
             }
             .background(.white)
@@ -112,7 +112,6 @@ struct SelectConnectionRow: View {
     }
 }
 
-
 #Preview {
-    SelectConnectionsView()
+    SelectConnectionsView(viewModel: SelectConnectionsViewModel())
 }

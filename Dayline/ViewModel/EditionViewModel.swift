@@ -1,10 +1,20 @@
 import Foundation
 import Combine
+import EventKit
 
 
 @MainActor
-@Observable
 final class EditionViewModel: ObservableObject {
+    
+    // Published state owned by the ViewModel
+    @Published var quote: Quote?
+    @Published var news: NewsArticle?
+    @Published var events: [EKEvent] = []
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+
+    // Services
+    private let calendarService = DayCalendarService()
     
     func fetchQuotes() async throws -> Quote {
         let endpoint = "https://zenquotes.io/api/today"
@@ -86,6 +96,20 @@ final class EditionViewModel: ObservableObject {
         return comic
         
     }
+    func load() async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
 
+        async let newsResult: NewsArticle? = try? fetchNews()
+        async let quoteResult: Quote? = try? fetchQuotes()
+        async let eventsResult: [EKEvent]? = try? calendarService.fetchEvents()
+
+        let (article, q, evts) = await (newsResult, quoteResult, eventsResult)
+
+        if let article { self.news = article }
+        if let q { self.quote = q }
+        if let evts { self.events = evts }
+    }
     
 }

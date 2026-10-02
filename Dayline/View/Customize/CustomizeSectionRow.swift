@@ -1,14 +1,7 @@
-//
-//  CustomizeSectionRow.swift
-//  Dayline
-//
-//  Created by Jibryll Brinkley on 9/19/26.
-//
-
 import SwiftUI
 
 struct CustomizeSectionRow: View {
-    
+
     @Binding var section: DailySection
     
     var body: some View {
@@ -19,8 +12,6 @@ struct CustomizeSectionRow: View {
             }
             .toggleStyle(.switch)
             .foregroundStyle(.black)
-            
         }
-        
     }
 }

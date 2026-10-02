@@ -1,4 +1,3 @@
-
 import Foundation
 import Combine
 
@@ -32,7 +31,6 @@ struct Edition: Identifiable, Codable, Hashable {
     }
 }
 extension Edition {
-    
     static let sampleEditions: [Edition] = [
         Edition(
             date: .now,
@@ -40,7 +38,6 @@ extension Edition {
             headline: "Preparation today creates tomorrow’s opportunities",
             imageName: "skyline"
         ),
-        
         Edition(
             date: Calendar.current.date(
                 byAdding: .day,
@@ -51,7 +48,6 @@ extension Edition {
             headline: "Small steps create momentum for meaningful progress",
             imageName: "nature"
         ),
-        
         Edition(
             date: Calendar.current.date(
                 byAdding: .day,

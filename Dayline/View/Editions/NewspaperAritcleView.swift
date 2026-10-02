@@ -13,7 +13,6 @@ struct NewspaperArticleView: View {
     let bodyText: String
     let page: Int
 
-
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)

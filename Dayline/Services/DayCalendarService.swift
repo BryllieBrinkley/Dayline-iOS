@@ -1,10 +1,3 @@
-//
-//  DayCalendarService.swift
-//  Dayline
-//
-//  Created by Jibryll Brinkley on 9/28/26.
-//
-
 import Foundation
 import EventKit
 
@@ -27,6 +20,5 @@ final class DayCalendarService {
         
         return store.events(matching: predicate)
             .sorted { $0.startDate < $1.startDate }
-        
     }
 }

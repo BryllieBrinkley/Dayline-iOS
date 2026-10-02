@@ -7,7 +7,6 @@ import Observation
 @MainActor
 final class WeatherManager: NSObject,
                             CLLocationManagerDelegate {
-
     private let weatherService = WeatherService.shared
     private let locationManager = CLLocationManager()
 
@@ -100,7 +99,6 @@ final class WeatherManager: NSObject,
         defer {
             isLoading = false
         }
-
         do {
             currentWeather =
                 try await weatherService.weather(

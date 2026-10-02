@@ -2,7 +2,7 @@ import SwiftUI
 import EventKit
 
 struct ScheduleSectionView: View {
-    @State private var scheduleItems: [ScheduleItem] = []
+    @StateObject private var viewModel = ScheduleSectionViewModel()
     
     private let calendarService = DayCalendarService()
     
@@ -28,35 +28,20 @@ struct ScheduleSectionView: View {
 
             Divider()
 
-            ForEach(Array(scheduleItems.enumerated()), id: \.element.id) { entry in
+            ForEach(Array(viewModel.scheduleItems.enumerated()), id: \.element.id) { entry in
                 let index = entry.offset
                 let item = entry.element
 
                 ScheduleRowView(
                     item: item,
                     isFirst: index == 0,
-                    isLast: index == scheduleItems.count - 1
+                    isLast: index == viewModel.scheduleItems.count - 1
                 )
             }
         }
         .task {
-            do {
-                let events = try await calendarService.fetchEvents()
-
-                scheduleItems = events.map { event in
-                    ScheduleItem(
-                        externalID: event.eventIdentifier,
-                        title: event.title ?? "Untitled event",
-                        startDate: event.startDate,
-                        endDate: event.endDate,
-                        location: event.location,
-                        notes: event.notes,
-                        isAllDay: event.isAllDay
-                    )
-                }
-            } catch {
-                print("Calendar fetch failed:", error)
-            }
+            await viewModel.load()
         }
     }
 }
+

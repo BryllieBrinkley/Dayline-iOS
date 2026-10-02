@@ -1,7 +1,5 @@
 import SwiftUI
 
-import SwiftUI
-
 struct CustomizeView: View {
     @StateObject private var viewModel = CustomizeViewModel()
 
@@ -76,7 +74,6 @@ struct CustomizeView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(.gray.opacity(0.25), lineWidth: 1)
             }
-        
     }
 
     private var saveButton: some View {

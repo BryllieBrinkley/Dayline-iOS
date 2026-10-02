@@ -7,13 +7,9 @@ struct EditionDetailView: View {
     
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = EditionViewModel()
-    @State private var quote: Quote?
-    @State private var news: NewsArticle?
-    @State private var todayEvents: [EKEvent] = []
-    private let calendarService = DayCalendarService()
+    @State private var saveError: String?
     private let weatherManager = WeatherManager()
     @Environment(\.modelContext) private var modelContext
-    @State private var saveError: String?
     private let comicURL = URL(string: "https://imgs.xkcd.com/comics/barrel_cropped_(1).jpg")
     
     
@@ -56,27 +52,7 @@ struct EditionDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .task {
-            do {
-                news = try await viewModel.fetchNews()
-                print("Loaded news:", news?.title ?? "No title")
-            } catch {
-                print("News fetch failed:", error)
-            }
-            do {
-                todayEvents = try await calendarService.fetchEvents()
-                print("Events found:", todayEvents.count)
-                for event in todayEvents {
-                    print(event.title ?? "Untitled", event.startDate ?? "Untitled start date")
-                }
-            } catch {
-                print("Calendar fetch failed:", error)
-            }
-            
-            do {
-                weatherManager.fetchCurrentWeather()
-            } catch {
-                print("Wether fetch failed:", error)
-            }
+            await viewModel.load()
         }
     }
     
@@ -135,45 +111,20 @@ struct EditionDetailView: View {
         }
     }
     private var newspaperGrid: some View {
-            Grid(horizontalSpacing: 20, verticalSpacing: 15) {
-                quoteSection
-                    .padding()
-                GridRow(alignment: .top) {
-                    yourWorldSection
-                        .newspaperColumnDivider()
-                    
-                    ScheduleSectionView()
-                }
-                
-                horizontalRule
-                
-                
-                TopThreeSectionView()
-                    .gridCellColumns(2)
-                
-                horizontalRule
-                
-                
-                comicSection
-                
-                
-    
+        Grid(horizontalSpacing: 20, verticalSpacing: 15) {
+            quoteSection
+                .padding()
+            GridRow(alignment: .top) {
+                yourWorldSection
+                    .newspaperColumnDivider()      
+                ScheduleSectionView()
             }
-            .onAppear(perform: {
-                Task {
-                    do {
-                        quote = try await viewModel.fetchQuotes()
-                    } catch QuoteError.invalidURL {
-                        print("invalid URL")
-                    } catch QuoteError.invalidResponse {
-                        print("invalid Resposne")
-                    } catch QuoteError.invalidData {
-                        print("invalid Data")
-                    } catch {
-                        print("Error")
-                    }
-                }
-            })
+            horizontalRule
+            TopThreeSectionView()
+                .gridCellColumns(2)
+            horizontalRule
+            comicSection
+        }
     }
     
     private var quoteSection: some View {
@@ -187,13 +138,13 @@ struct EditionDetailView: View {
             
             .clipped()
             
-            Text(quote?.q ?? "Preperation today creates tommorw's opportunites.")
+            Text(viewModel.quote?.q ?? "Preperation today creates tommorw's opportunites.")
                 .font(.system(size: 10, design: .serif))
                 .fontWeight(.semibold)
                 .multilineTextAlignment(.center)
                 .lineLimit(5)
             
-            Text("- \(quote?.a ?? "Charlie Chaplin")")
+            Text("- \(viewModel.quote?.a ?? "Charlie Chaplin")")
                 .font(.system(.subheadline, design: .serif))
                 .fontWeight(.semibold)
             
@@ -202,11 +153,11 @@ struct EditionDetailView: View {
     }
     
     private var todaysSchedule: String {
-        guard !todayEvents.isEmpty else {
+        guard !viewModel.events.isEmpty else {
             return "No events scheduled today."
         }
         
-        let lines: [String] = todayEvents.map { event in
+        let lines: [String] = viewModel.events.map { event in
             let time = event.isAllDay
             ? "All day"
             : event.startDate.formatted(date: .omitted, time: .shortened)
@@ -222,7 +173,7 @@ struct EditionDetailView: View {
     private var dailyEventsSection: some View {
         NewspaperArticleView(
             title: "Your Day",
-            subtitle: "\(todayEvents.count) events today",
+            subtitle: "\(viewModel.events.count) events today",
             bodyText: todaysSchedule,
             page: 1
         )
@@ -241,7 +192,7 @@ struct EditionDetailView: View {
                 .font(.system(.title2, design: .serif, weight: .bold))
             
             // Article image
-            AsyncImage(url: news?.image.flatMap(URL.init(string:))) { image in
+            AsyncImage(url: viewModel.news?.image.flatMap(URL.init(string:))) { image in
                 image
                     .resizable()
                     .scaledToFill()
@@ -253,8 +204,8 @@ struct EditionDetailView: View {
             .frame(width: 140, height: 120)
             .clipped()
             
-            if let title = news?.title {
-                if let urlString = news?.url, let url = URL(string: urlString) {
+            if let title = viewModel.news?.title {
+                if let urlString = viewModel.news?.url, let url = URL(string: urlString) {
                     Link(destination: url) {
                         Text(title)
                             .font(.system(.headline, design: .serif))
@@ -399,3 +350,4 @@ extension View {
 #Preview {
     EditionDetailView()
 }
+

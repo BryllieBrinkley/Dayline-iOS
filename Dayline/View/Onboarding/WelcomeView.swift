@@ -2,27 +2,21 @@ import SwiftUI
 
 struct WelcomeView: View {
     @Binding var hasCompletedOnboarding: Bool
+    @StateObject private var viewModel = WelcomeViewModel()
 
     var body: some View {
         ScrollView {
             VStack {
-
                 WelcomeHeaderView()
-                
                 Image("newspaper")
                     .resizable()
                     .scaledToFit()
                     .frame(height: 200)
                 
-                SelectConnectionsView()
-
+                SelectConnectionsView(viewModel: viewModel.connectionsViewModel)
                 Button {
-                    withAnimation {
-                        hasCompletedOnboarding = true
-                    }
-
+                    viewModel.completeOnboarding()
                 } label: {
-
                     HStack(spacing: 10) {
 
                         Text("Create My First Edition")
@@ -44,6 +38,12 @@ struct WelcomeView: View {
             .padding(.vertical, 12)
         }
         .scrollIndicators(.hidden)
+        .onChange(of: viewModel.isReadyToFinishOnboarding) { _, newValue in
+            guard newValue else { return }
+            withAnimation {
+                hasCompletedOnboarding = true
+            }
+        }
     }
 }
 

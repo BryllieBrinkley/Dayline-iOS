@@ -1,26 +1,8 @@
-//
-//  TopThreeSectionView.swift
-//  Dayline
-//
-//  Created by Jibryll Brinkley on 9/18/26.
-//
-
 import SwiftUI
 
 struct TopThreeSectionView: View {
     
-    @State private var tasks = [
-        DailyTask(
-            title: "Work on portfolio"
-        ),
-        DailyTask(
-            title: "HW for Math"
-        ),
-        DailyTask(
-            title: "Workout with Coach"
-        )
-    ]
-    
+    @StateObject private var viewModel = TopThreeSectionViewModel()
     @State private var showingAddTask = false
     @State private var newTask = ""
     
@@ -48,13 +30,13 @@ struct TopThreeSectionView: View {
             }
             
             VStack(spacing: 0) {
-                ForEach(tasks.indices, id: \.self) { index in
+                ForEach(viewModel.tasks.indices, id: \.self) { index in
                     
                     TopThreeRow(
-                        task: $tasks[index]
+                        task: $viewModel.tasks[index]
                     )
                     
-                    if index < tasks.count - 1 {
+                    if index < viewModel.tasks.count - 1 {
                         Divider()
                             .padding(.leading, 44)
                     }
@@ -76,11 +58,9 @@ struct TopThreeSectionView: View {
             TextField("Task name", text: $newTask)
 
             Button("Add") {
-                let title = newTask.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !title.isEmpty else { return }
-
-                tasks.append(DailyTask(title: title))
-                newTask = ""
+                if viewModel.addTask(title: newTask) {
+                    newTask = ""
+                }
             }
 
             Button("Cancel", role: .cancel) {
@@ -137,3 +117,4 @@ struct TopThreeRow: View {
 #Preview {
     TopThreeSectionView()
 }
+
