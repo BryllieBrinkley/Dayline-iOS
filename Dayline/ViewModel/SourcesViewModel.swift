@@ -9,3 +9,4 @@ final class SourcesViewModel {
 
     var editionTime = "7:00 AM"
 }
+

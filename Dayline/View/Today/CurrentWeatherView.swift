@@ -1,10 +1,3 @@
-//
-//  CurrentWeatherVIew.swift
-//  Dayline
-//
-//  Created by Jibryll Brinkley on 9/22/26.
-//
-
 import SwiftUI
 import WeatherKit
 

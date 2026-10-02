@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct ConnectionSourceRowView: View {
-
     let source: OnboardingSourceItem
 
     private var isConnected: Bool {

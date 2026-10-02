@@ -15,3 +15,7 @@ enum QuoteError: Error {
 enum NewsError: Error {
     case invalidURL, invalidResponse, invalidData, missingAPIKey
 }
+
+enum ComicError: Error {
+    case invalidURL, invalidResponse, invalidData, missingAPIKey
+}

@@ -1,8 +1,10 @@
 import SwiftUI
 import EventKit
 import WeatherKit
+import SwiftData
 
 struct EditionDetailView: View {
+    
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = EditionViewModel()
     @State private var quote: Quote?
@@ -10,6 +12,10 @@ struct EditionDetailView: View {
     @State private var todayEvents: [EKEvent] = []
     private let calendarService = DayCalendarService()
     private let weatherManager = WeatherManager()
+    @Environment(\.modelContext) private var modelContext
+    @State private var saveError: String?
+    private let comicURL = URL(string: "https://imgs.xkcd.com/comics/barrel_cropped_(1).jpg")
+    
     
     let currentDate = Date()
     let editionNumber = 24
@@ -37,12 +43,11 @@ struct EditionDetailView: View {
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
-                        // Add printing later
+                        // print func
                     } label: {
                         Image(systemName: "printer")
                     }
                     .accessibilityLabel("Print")
-                    
                     ShareLink(item: "My Dayline morning edition") {
                         Image(systemName: "square.and.arrow.up")
                     }
@@ -68,13 +73,11 @@ struct EditionDetailView: View {
             }
             
             do {
-                try await weatherManager.fetchCurrentWeather()
+                weatherManager.fetchCurrentWeather()
             } catch {
                 print("Wether fetch failed:", error)
             }
-            
         }
-        
     }
     
     private var editionHeader: some View {
@@ -102,6 +105,10 @@ struct EditionDetailView: View {
             Divider()
             
             HStack {
+                Text("MORNING EDITION NO. \(editionNumber)")
+                
+                Spacer()
+                
                 Text(
                     currentDate.formatted(
                         .dateTime
@@ -115,72 +122,83 @@ struct EditionDetailView: View {
                 
                 Spacer()
                 
-                Text("MORNING EDITION NO. \(editionNumber)")
+                CurrentWeatherView()
+                
+                Spacer()
             }
             .font(.system(size: 8, weight: .semibold, design: .serif))
             .lineLimit(1)
             .padding(.horizontal)
             .padding(.top, 5)
             
+            
         }
     }
     private var newspaperGrid: some View {
-        Grid(horizontalSpacing: 14, verticalSpacing: 12) {
-            GridRow(alignment: .top) {
-                weatherView
-                    .newspaperColumnDivider()
-                VStack(alignment: .leading, spacing: 8) {
-                    Image("skyline")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 120)
-                        .frame(maxWidth: .infinity)
-                        .clipped()
+            Grid(horizontalSpacing: 20, verticalSpacing: 15) {
+                quoteSection
+                    .padding()
+                GridRow(alignment: .top) {
+                    yourWorldSection
+                        .newspaperColumnDivider()
                     
-                    Text(quote?.q ?? "Preperation today creates tommorw's opportunites.")
-                        .font(.system(.title3, design: .serif))
-                        .fontWeight(.semibold)
-                    
-                    Text(quote?.a ?? "Charlie Chaplin")
-                        .font(.system(.headline, design: .serif))
-                        .fontWeight(.semibold)
-                    
+                    ScheduleSectionView()
                 }
-            }
-            
-            horizontalRule
-            
-            GridRow(alignment: .top) {
-                yourWorldSection
-                    .newspaperColumnDivider()
-                dailyEventsSection
                 
-            }
-            
-            horizontalRule
-            
-            GridRow(alignment: .top) {
-                crosswordCard
-                    .newspaperColumnDivider()
+                horizontalRule
+                
+                
                 TopThreeSectionView()
+                    .gridCellColumns(2)
+                
+                horizontalRule
+                
+                
+                comicSection
+                
+                
+    
             }
-        }
-        
-        .onAppear(perform: {
-            Task {
-                do {
-                    quote = try await viewModel.fetchQuotes()
-                } catch QuoteError.invalidURL {
-                    print("invalid URL")
-                } catch QuoteError.invalidResponse {
-                    print("invalid Resposne")
-                } catch QuoteError.invalidData {
-                    print("invalid Data")
-                } catch {
-                    print("Error")
+            .onAppear(perform: {
+                Task {
+                    do {
+                        quote = try await viewModel.fetchQuotes()
+                    } catch QuoteError.invalidURL {
+                        print("invalid URL")
+                    } catch QuoteError.invalidResponse {
+                        print("invalid Resposne")
+                    } catch QuoteError.invalidData {
+                        print("invalid Data")
+                    } catch {
+                        print("Error")
+                    }
                 }
+            })
+    }
+    
+    private var quoteSection: some View {
+        VStack(alignment: .center, spacing: 8) {
+            AsyncImage(url: dailyPhotoURL) { image in
+                image
+                    .resizable()
+            } placeholder: {
+                Color.gray.opacity(0.15)
             }
-        })
+            
+            .clipped()
+            
+            Text(quote?.q ?? "Preperation today creates tommorw's opportunites.")
+                .font(.system(size: 10, design: .serif))
+                .fontWeight(.semibold)
+                .multilineTextAlignment(.center)
+                .lineLimit(5)
+            
+            Text("- \(quote?.a ?? "Charlie Chaplin")")
+                .font(.system(.subheadline, design: .serif))
+                .fontWeight(.semibold)
+            
+        }
+        .frame(width: .infinity, height: 250)
     }
     
     private var todaysSchedule: String {
@@ -254,18 +272,32 @@ struct EditionDetailView: View {
             }
             
             // Description / summary
-            if let description = news?.description, description.isEmpty == false {
-                Text(description)
-                    .foregroundStyle(.secondary)
-            }
+//            if let description = news?.description, description.isEmpty == false {
+//                Text(description)
+//                    .lineLimit(3)
+//                    .foregroundStyle(.secondary)
+//            }
         }
+    }
+    
+    private var dailyPhotoURL: URL? {
+        let date = Calendar.current.dateComponents(
+            [.year, .month, .day],
+            from: currentDate
+        )
+        let seed = "\(date.year!)-\(date.month!)-\(date.day!)"
+
+        return URL(
+            string: "https://picsum.photos/seed/dayline-\(seed)/800/600"
+        )
     }
     
     private var crosswordCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Today’s Mini Crossword")
-                .font(.system(.title3, design: .serif, weight: .bold))
-            
+            Text("Today’s Crossword")
+                .font(.system(.subheadline, design: .serif, weight: .bold))
+                .lineLimit(1)
+            Spacer()
             Image("mini-crossword")
                 .resizable()
                 .scaledToFit()
@@ -320,6 +352,37 @@ struct EditionDetailView: View {
         .fontWeight(.semibold)
         .fontDesign(.serif)
         }
+    
+    private func saveEdition(news: NewsArticle, quote: Quote) {
+        let edition = SavedEdition(
+            headline: news.title ?? "",
+            articleSummary: news.description ?? "",
+            articleURL: news.url,
+            quoteText: quote.q,
+            quoteAuthor: quote.a
+        )
+
+        modelContext.insert(edition)
+
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.delete(edition)
+            saveError = error.localizedDescription
+        }
+    }
+    
+    
+    
+    private var comicSection: some View {
+        AsyncImage(url: comicURL) { image in
+            image
+                .resizable()
+                .scaledToFill()
+        } placeholder: {
+            ProgressView()
+        }
+    }
 }
 
 extension View {

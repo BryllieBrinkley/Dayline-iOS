@@ -74,4 +74,18 @@ final class EditionViewModel: ObservableObject {
         }
     }
     
+    
+    func fetchComic() async throws -> Comic {
+
+        let url = URL(string: "https://xkcd.com/info.0.json")!
+        
+        let (data, _) = try await URLSession.shared.data(from: url)
+        
+        let comic = try JSONDecoder().decode(Comic.self, from: data)
+        
+        return comic
+        
+    }
+
+    
 }

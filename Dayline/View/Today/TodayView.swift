@@ -38,11 +38,10 @@ struct TodayView: View {
                     
                     CurrentWeatherView()
                 }
-
-                TopThreeSectionView()
                 Spacer()
                 ScheduleSectionView()
-                
+                Spacer()
+                TopThreeSectionView()
                 
                 Spacer()
             }

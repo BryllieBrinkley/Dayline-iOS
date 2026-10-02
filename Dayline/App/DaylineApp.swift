@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct DaylineApp: App {
@@ -18,6 +19,7 @@ struct DaylineApp: App {
         WindowGroup {
             RootTabView()
         }
+        .modelContainer(for: SavedEdition.self)
     }
 }
 

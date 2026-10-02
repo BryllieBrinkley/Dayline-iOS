@@ -49,14 +49,7 @@ struct ScheduleRowView: View {
                     .fontWeight(
                         isCurrent ? .semibold : .regular
                     )
-                    .lineLimit(1)
 
-                if let detail = item.detail {
-                    Text(detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
             }
             .frame(
                 maxWidth: .infinity,
