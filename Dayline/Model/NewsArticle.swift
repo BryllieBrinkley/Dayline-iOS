@@ -3,8 +3,8 @@ import Foundation
 struct News: Codable {
     let articles: [NewsArticle]
 }
-
-struct NewsArticle: Codable {
+struct NewsArticle: Codable, Identifiable {
+    let id = UUID()
     let title: String?
     let description: String?
     let content: String?

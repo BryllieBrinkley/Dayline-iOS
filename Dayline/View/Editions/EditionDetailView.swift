@@ -111,17 +111,13 @@ struct EditionDetailView: View {
         }
     }
     private var newspaperGrid: some View {
-        Grid(horizontalSpacing: 20, verticalSpacing: 15) {
-            quoteSection
-                .padding()
-            GridRow(alignment: .top) {
-                yourWorldSection
-                    .newspaperColumnDivider()      
-                ScheduleSectionView()
-            }
-            horizontalRule
+        VStack(alignment: .center, spacing: 25) {
+            ScheduleSectionView()
             TopThreeSectionView()
-                .gridCellColumns(2)
+            quoteSection
+            yourWorldSection
+            
+            
             horizontalRule
             comicSection
         }
@@ -132,10 +128,10 @@ struct EditionDetailView: View {
             AsyncImage(url: dailyPhotoURL) { image in
                 image
                     .resizable()
+                    .scaledToFit()
             } placeholder: {
                 Color.gray.opacity(0.15)
             }
-            
             .clipped()
             
             Text(viewModel.quote?.q ?? "Preperation today creates tommorw's opportunites.")
@@ -149,7 +145,7 @@ struct EditionDetailView: View {
                 .fontWeight(.semibold)
             
         }
-        .frame(width: .infinity, height: 250)
+        .frame(maxWidth: .infinity)
     }
     
     private var todaysSchedule: String {
@@ -187,47 +183,65 @@ struct EditionDetailView: View {
     }
     
     private var yourWorldSection: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .center, spacing: 12) {
+
             Text("Your World")
-                .font(.system(.title2, design: .serif, weight: .bold))
-            
-            // Article image
-            AsyncImage(url: viewModel.news?.image.flatMap(URL.init(string:))) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                Image("newspaper")
-                    .resizable()
-                    .scaledToFill()
-            }
-            .frame(width: 140, height: 120)
-            .clipped()
-            
-            if let title = viewModel.news?.title {
-                if let urlString = viewModel.news?.url, let url = URL(string: urlString) {
-                    Link(destination: url) {
-                        Text(title)
-                            .font(.system(.headline, design: .serif))
-                            .foregroundStyle(.primary)
+                .font(.system(.largeTitle, design: .serif, weight: .bold))
+                .fontWidth(.expanded)
+
+            ForEach(viewModel.articles) { article in
+
+                VStack(spacing: 8) {
+
+                    AsyncImage(
+                        url: article.image.flatMap(URL.init(string:))
+                    ) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        Image("newspaper")
+                            .resizable()
+                            .scaledToFill()
                     }
-                    .buttonStyle(.plain)
-                } else {
-                    Text(title)
-                        .font(.system(.headline, design: .serif))
+                    .frame(height: 180)
+                    .clipped()
+
+                    if let title = article.title {
+
+                        if let urlString = article.url,
+                           let url = URL(string: urlString) {
+
+                            Link(destination: url) {
+                                Text(title)
+                                    .font(.system(.headline, design: .serif))
+                                    .foregroundStyle(.primary)
+                            }
+                            .buttonStyle(.plain)
+
+                        } else {
+                            Text(title)
+                                .font(.system(.headline, design: .serif))
+                        }
+
+                    } else {
+                        Text("Loading today's news...")
+                            .font(.system(.headline, design: .serif))
+                            .redacted(reason: .placeholder)
+                    }
+
+                    if let description = article.description,
+                       !description.isEmpty {
+
+                        Text(description)
+                            .lineLimit(3)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
                 }
-            } else {
-                Text("Loading today's news...")
-                    .font(.system(.headline, design: .serif))
-                    .redacted(reason: .placeholder)
+
+                Divider()
             }
-            
-            // Description / summary
-//            if let description = news?.description, description.isEmpty == false {
-//                Text(description)
-//                    .lineLimit(3)
-//                    .foregroundStyle(.secondary)
-//            }
         }
     }
     
@@ -237,7 +251,7 @@ struct EditionDetailView: View {
             from: currentDate
         )
         let seed = "\(date.year!)-\(date.month!)-\(date.day!)"
-
+        
         return URL(
             string: "https://picsum.photos/seed/dayline-\(seed)/800/600"
         )
@@ -265,26 +279,26 @@ struct EditionDetailView: View {
             if let currentWeather = weatherManager.currentWeather {
                 
                 Text(weatherManager.cityName ?? "Weather")
-           
                 
-                    Image(systemName: currentWeather.symbolName)
-                        .symbolRenderingMode(.multicolor)
-                    
-                    Text(
-                        currentWeather.temperature.formatted(
-                            .measurement(
-                                width: .abbreviated,
-                                usage: .weather,
-                                numberFormatStyle: .number
-                                    .precision(.fractionLength(0))
-                            )
+                
+                Image(systemName: currentWeather.symbolName)
+                    .symbolRenderingMode(.multicolor)
+                
+                Text(
+                    currentWeather.temperature.formatted(
+                        .measurement(
+                            width: .abbreviated,
+                            usage: .weather,
+                            numberFormatStyle: .number
+                                .precision(.fractionLength(0))
                         )
                     )
-                    .fontWeight(.semibold)
+                )
+                .fontWeight(.semibold)
                 
                 
                 Text(currentWeather.condition.description)
-        
+                
                     .foregroundStyle(.secondary)
                 
             } else if weatherManager.isLoading {
@@ -302,7 +316,7 @@ struct EditionDetailView: View {
         .font(.largeTitle)
         .fontWeight(.semibold)
         .fontDesign(.serif)
-        }
+    }
     
     private func saveEdition(news: NewsArticle, quote: Quote) {
         let edition = SavedEdition(
@@ -312,9 +326,9 @@ struct EditionDetailView: View {
             quoteText: quote.q,
             quoteAuthor: quote.a
         )
-
+        
         modelContext.insert(edition)
-
+        
         do {
             try modelContext.save()
         } catch {
@@ -326,12 +340,17 @@ struct EditionDetailView: View {
     
     
     private var comicSection: some View {
-        AsyncImage(url: comicURL) { image in
-            image
-                .resizable()
-                .scaledToFill()
-        } placeholder: {
-            ProgressView()
+        VStack {
+            Text("Comic of the Day")
+                .font(.largeTitle)
+                .fontDesign(.serif)
+            AsyncImage(url: comicURL) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+            } placeholder: {
+                ProgressView()
+            }
         }
     }
 }

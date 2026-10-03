@@ -10,43 +10,44 @@ struct TodayView: View {
     @State private var weatherManager = WeatherManager()
 
     var body: some View {
-        ScrollView {
-            VStack(
-                alignment: .leading,
-                spacing: 12
-            ) {
-                headerWithProfilePicView
-                
-                Text("Good morning, User")
-                    .font(.system(
-                        .largeTitle,
-                        design: .serif,
-                        weight: .semibold
-                    ))
-
-                HStack {
-                    Text(
-                        currentDate.formatted(
-                            date: .complete,
-                            time: .omitted
-                        )
-                    )
-                    .font(.headline)
-                    .lineLimit(1)
-
-                    Spacer()
-                    
-                    CurrentWeatherView()
-                }
-                Spacer()
-                ScheduleSectionView()
-                Spacer()
-                TopThreeSectionView()
-                
-                Spacer()
-            }
-            .padding(.horizontal)
-        }
+//        ScrollView {
+//            VStack(
+//                alignment: .leading,
+//                spacing: 12
+//            ) {
+//                headerWithProfilePicView
+//                
+//                Text("Good morning, User")
+//                    .font(.system(
+//                        .largeTitle,
+//                        design: .serif,
+//                        weight: .semibold
+//                    ))
+//
+//                HStack {
+//                    Text(
+//                        currentDate.formatted(
+//                            date: .complete,
+//                            time: .omitted
+//                        )
+//                    )
+//                    .font(.headline)
+//                    .lineLimit(1)
+//
+//                    Spacer()
+//                    
+//                    CurrentWeatherView()
+//                }
+//                Spacer()
+//                ScheduleSectionView()
+//                Spacer()
+//                TopThreeSectionView()
+//                
+//                Spacer()
+//            }
+//            .padding(.horizontal)
+//        }
+        EditionDetailView()
         .task {
             try? await Task.sleep(nanoseconds: 150_000_000)
             await MainActor.run {
